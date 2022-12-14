@@ -2,6 +2,7 @@ import pygame
 import sys
 import os
 import random
+import neat
 
 
 def draw_floor():
@@ -121,10 +122,6 @@ bird_rect = bird_surface.get_rect(center=(100, 512))
 
 birdflap = pygame.USEREVENT + 1
 pygame.time.set_timer(birdflap, 200)
-# bird_surface = pygame.image.load(os.path.join(
-#     'assets', 'bluebird-midflap.png')).convert_alpha()
-# bird_surface = pygame.transform.scale2x(bird_surface)
-# bird_rect = bird_surface.get_rect(center=(100, 512))
 
 pipe_surface = pygame.image.load(
     os.path.join('assets', 'pipe-green.png')).convert()
