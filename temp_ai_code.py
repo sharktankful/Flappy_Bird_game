@@ -44,10 +44,13 @@ class Bird:
         self.bird_movement += self.gravity
         self.bird_rect.centery += self.bird_movement
 
-        pygame.transform.rotozoom(self.img[self.bird_index], -self.bird_movement * 3, 1)
+        self.image = pygame.transform.rotozoom(self.img[self.bird_index], -self.bird_movement * 3, 1)
+        # self.rect = self.image.get_rect(center=(self.x, self.y))
+        # self.rect.centery += self.bird_movement
     
     def draw(self, win):
-        win.blit(self.img[self.bird_index], self.bird_rect)
+        # win.blit(self.img[self.bird_index], self.bird_rect)
+        win.blit(self.image, self.bird_rect)
 
 
 # FUNCTION TO DRAW THE WINDOW
@@ -72,11 +75,11 @@ def main():
         # bird.move()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                run = False      
+                run = False 
 
             if event.type == birdflap:
                 bird.bird_animation()
-
+        bird.move()
         draw_window(win, bird)
 
     clock.tick(60)
