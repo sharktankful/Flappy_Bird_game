@@ -6,7 +6,8 @@ import random
 import sys
 
 pygame.init()
-clock = pygame.time.Clock()
+
+
 # VARIABLES THAT DEFINE SCREEN SIZE
 screen_width = 500
 screen_height = 800
@@ -19,10 +20,6 @@ bird_imgs = [pygame.transform.scale2x(pygame.image.load(os.path.join('assets', '
     os.path.join('assets', 'yellowbird-midflap.png'))), pygame.transform.scale2x(pygame.image.load(os.path.join('assets', 'yellowbird-downflap.png')))]
 bg_img = pygame.transform.scale2x(pygame.image.load(os.path.join('assets', 'background-day.png' )))
 
-# TIMER FOR BIRD FLAP IMAGES
-birdflap = pygame.USEREVENT
-pygame.time.set_timer(birdflap, 200)
-
 class Bird:
     img = bird_imgs
     gravity = 0.25
@@ -34,13 +31,13 @@ class Bird:
         self.bird_index = 0
         self.bird_rect = self.img[self.bird_index].get_rect(center = (self.x, self.y))
 
-    def bird_animation(self, win):
+    def bird_animation(self):
         if self.bird_index < 2:
             self.bird_index += 1
         else:
             self.bird_index = 0
 
-        win.blit(self.img[self.bird_index], self.bird_rect)
+        # win.blit(self.img[self.bird_index], self.bird_rect)
         
     def move(self):
         self.bird_movement = 8
@@ -48,13 +45,18 @@ class Bird:
         self.bird_rect.centery += self.bird_movement
 
         pygame.transform.rotozoom(self.img[self.bird_index], -self.bird_movement * 3, 1)
+    
+    def draw(self, win):
+        win.blit(self.img[self.bird_index], self.bird_rect)
 
 
 # FUNCTION TO DRAW THE WINDOW
 def draw_window(win, bird):
     win.blit(bg_img, (0,0))
-    bird.bird_animation(win)
+    bird.draw(win)
     pygame.display.update()
+
+
 
 # MAIN FUNCTION OF OUR GAME
 def main():
@@ -62,15 +64,19 @@ def main():
     bird = Bird(200, 200)
     run = True
 
+    # TIMER FOR BIRD FLAP IMAGES
+    birdflap = pygame.USEREVENT
+    pygame.time.set_timer(birdflap, 100)
+
     while run:
+        # bird.move()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False      
 
             if event.type == birdflap:
-                bird.bird_animation(win)
+                bird.bird_animation()
 
-        bird.move()
         draw_window(win, bird)
 
     clock.tick(60)
