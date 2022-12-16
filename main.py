@@ -95,7 +95,6 @@ clock = pygame.time.Clock()
 game_front = pygame.font.Font('04B_19.ttf', 40)
 
 # GAME VARIABLES
-main_game = True
 gravity = 0.25
 bird_movement = 0
 game_active = True
@@ -140,91 +139,69 @@ death_sound = pygame.mixer.Sound(os.path.join('sound', 'sfx_hit.wav'))
 score_sound = pygame.mixer.Sound(os.path.join('sound', 'sfx_point.wav'))
 score_sound_countdown = 100
 
-def main():
-    global game_active, bird_movement, bird_surface, bird_frames, bird_index, bird_rect, pipe_list, floor_x_pos, score, high_score
+
 # MAIN GAME LOOP WHERE THE GAME RUNS
-    while main_game == True:
+while True:
     # IF WE PRESS THE CLOSE BUTTON ON THE GAME WINDOW IT WILL CLOSE THE GAME
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit
-                sys.exit()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE and game_active:
-                    bird_movement = 0
-                    bird_movement = -8
-                    flap_sound.play()
-                if event.key == pygame.K_SPACE and game_active == False:
-                    game_active = True
-                    pipe_list.clear()
-                    bird_rect.center = (100, 512)
-                    bird_movement = 0
-                    score = 0
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit
+            sys.exit()
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE and game_active:
+                bird_movement = 0
+                bird_movement = -8
+                flap_sound.play()
+            if event.key == pygame.K_SPACE and game_active == False:
+                game_active = True
+                pipe_list.clear()
+                bird_rect.center = (100, 512)
+                bird_movement = 0
+                score = 0
 
-            if event.type == birdflap:
-                if bird_index < 2:
-                    bird_index += 1
-                else:
-                    bird_index = 0
+        if event.type == birdflap:
+            if bird_index < 2:
+                bird_index += 1
+            else:
+                bird_index = 0
+            
+            bird_surface, bird_rect = bird_animation()
                 
-                bird_surface, bird_rect = bird_animation()
-                    
-            if event.type == spawnpipe:
-                pipe_list.extend(create_pipe())
+        if event.type == spawnpipe:
+            pipe_list.extend(create_pipe())
 
-        # BACKGROUND SURFACE
-        screen.blit(bg_surface, (0, 0))
+    # BACKGROUND SURFACE
+    screen.blit(bg_surface, (0, 0))
 
-        if game_active:
-            # CREATES GRAVITY FOR BIRD
-            bird_movement += gravity
-            rotated_bird = rotate_bird(bird_surface)
-            bird_rect.centery += bird_movement
-            # DRAWS BIRD RECTANGLE
-            screen.blit(rotated_bird, bird_rect)
-            # CHECK FOR COLLISION BETWEEN PIPES AND BIRD
-            game_active = check_collision(pipe_list)
-            # PIPES
-            pipe_list = move_pipes(pipe_list)
-            draw_pipes(pipe_list)
-            score_display('main_game')
-            pipe_score_check()
+    if game_active:
+        # CREATES GRAVITY FOR BIRD
+        bird_movement += gravity
+        rotated_bird = rotate_bird(bird_surface)
+        #SETS BIRDS GRAVITY TO BIRD MOVEMENT VARIABLE
+        bird_rect.centery += bird_movement
+        # DRAWS BIRD RECTANGLE
+        screen.blit(rotated_bird, bird_rect)
+        # CHECK FOR COLLISION BETWEEN PIPES AND BIRD
+        game_active = check_collision(pipe_list)
+        # PIPES
+        pipe_list = move_pipes(pipe_list)
+        draw_pipes(pipe_list)
+        score_display('main_game')
+        pipe_score_check()
 
-        else:
-            screen.blit(game_over_surface, game_over_rect)
-            high_score = update_score(score, high_score)
-            score_display('game_over')
+    else:
+        screen.blit(game_over_surface, game_over_rect)
+        high_score = update_score(score, high_score)
+        score_display('game_over')
 
-        # IF FLOOR POSITION REACHES SPECIFIC NUMBER, IT RESETS BACK TO THE BEGINNING
-        floor_x_pos -= 1
-        draw_floor()
-        if floor_x_pos <= -576:
-            floor_x_pos = 0
+    # IF FLOOR POSITION REACHES SPECIFIC NUMBER, IT RESETS BACK TO THE BEGINNING
+    floor_x_pos -= 1
+    draw_floor()
+    if floor_x_pos <= -576:
+        floor_x_pos = 0
 
-        # DRAWS ALL SURFACES TO THE DISPLAY SURFACE
-        pygame.display.update()
+    # DRAWS ALL SURFACES TO THE DISPLAY SURFACE
+    pygame.display.update()
 
-        # CONTROLS THE FRAME RATE AT 120FPS
-        clock.tick(120)
-main()
-
-
-def run(config_path):
-    config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction, neat.DefaultSpeciesSet, neat.DefaultStagnation, config_path)
-
-    p = neat.Population(config)
-
-    p.add_reporter(neat.StdOutReporter(True))
-    stats = neat.StatisticsReporter()
-    p.add_reporter(stats)
-
-    p.run(main, 50)
-
-if __name__ == '__main__':
-    local_dir = os.path.dirname(__file__)
-    config_path = os.path.join(local_dir, 'config-neat.txt')
-    run(config_path)
-
-    
-
-    
+    # CONTROLS THE FRAME RATE AT 120FPS
+    clock.tick(120)

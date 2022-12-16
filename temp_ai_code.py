@@ -6,37 +6,48 @@ import random
 import sys
 
 pygame.init()
-
+clock = pygame.time.Clock()
 # VARIABLES THAT DEFINE SCREEN SIZE
 screen_width = 500
 screen_height = 800
 
+# CLOCK TO SET FRAME RATE
+clock = pygame.time.Clock()
+
 # VARIABLES THAT CONTAIN GAME IMAGES
-bird_imgs = [pygame.transform.scale2x(pygame.image.load(os.path.join('assets', 'bluebird-upflap.png'))), pygame.transform.scale2x(pygame.image.load(
-    os.path.join('assets', 'bluebird-midflap.png'))), pygame.transform.scale2x(pygame.image.load(os.path.join('assets', 'bluebird-downflap.png')))]
+bird_imgs = [pygame.transform.scale2x(pygame.image.load(os.path.join('assets', 'yellowbird-upflap.png'))), pygame.transform.scale2x(pygame.image.load(
+    os.path.join('assets', 'yellowbird-midflap.png'))), pygame.transform.scale2x(pygame.image.load(os.path.join('assets', 'yellowbird-downflap.png')))]
 bg_img = pygame.transform.scale2x(pygame.image.load(os.path.join('assets', 'background-day.png' )))
+
+# TIMER FOR BIRD FLAP IMAGES
+birdflap = pygame.USEREVENT
+pygame.time.set_timer(birdflap, 200)
 
 class Bird:
     img = bird_imgs
-    birdflap = pygame.USEREVENT
-    pygame.time.set_timer(birdflap, 200)
+    gravity = 0.25
 
     def __init__(self, x, y):
         self.x = x
         self.y = y
+        self.bird_movement = 0
         self.bird_index = 0
+        self.bird_rect = self.img[self.bird_index].get_rect(center = (self.x, self.y))
 
     def bird_animation(self, win):
-        # new_bird = bird_imgs[self.bird_index]
+        if self.bird_index < 2:
+            self.bird_index += 1
+        else:
+            self.bird_index = 0
 
-        for event in pygame.event.get():
-            if event.type == self.birdflap:
-                if self.img[self.bird_index] < 2:
-                    self.bird_index += 1
-                else:
-                    self.bird_index = 0
-        win.blit(self.img[self.bird_index], (self.x, self.y))
+        win.blit(self.img[self.bird_index], self.bird_rect)
         
+    def move(self):
+        self.bird_movement = 8
+        self.bird_movement += self.gravity
+        self.bird_rect.centery += self.bird_movement
+
+        pygame.transform.rotozoom(self.img[self.bird_index], -self.bird_movement * 3, 1)
 
 
 # FUNCTION TO DRAW THE WINDOW
@@ -54,11 +65,18 @@ def main():
     while run:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                run = False
+                run = False      
 
+            if event.type == birdflap:
+                bird.bird_animation(win)
+
+        bird.move()
         draw_window(win, bird)
 
+    clock.tick(60)
     pygame.quit()
-    sys.exit
+    sys.exit()  
+
+
 
 main()
